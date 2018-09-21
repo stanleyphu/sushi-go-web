@@ -3,6 +3,7 @@ const http = require('http');
 const path = require('path');
 const socketIO = require('socket.io');
 
+const { generateMessage } = require('./utils/message');
 const clientPath = path.join(__dirname, '../client');
 const port = process.env.PORT || 3000;
 var app = express();
@@ -14,17 +15,20 @@ var players = {};
 app.use(express.static(clientPath));
 
 io.on('connection', (socket) => {
+
+  // User initialization
   console.log('user connected: ', socket.id);
 
   players[socket.id] = {
     socket
   };
-  console.log('(joined) players: ', players);
+  socket.emit('newMessage', generateMessage('ADMIN', `Welcome to Sushi Go! (${socket.id})`));
+  socket.broadcast.emit('newMessage', generateMessage('ADMIN', `New user (${socket.id}) has joined the room`));
 
   socket.on('disconnect', () => {
     console.log('user disconnected: ', socket.id);
     delete players[socket.id];
-    console.log('(left) players: ', players);
+    socket.broadcast.emit('newMessage', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
   });
 });
 
