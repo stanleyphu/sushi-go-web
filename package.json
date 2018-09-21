@@ -1,0 +1,23 @@
+{
+  "name": "sushi-go-web",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stanleyphu/sushi-go-web.git"
+  },
+  "author": "Stanley Phu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stanleyphu/sushi-go-web/issues"
+  },
+  "homepage": "https://github.com/stanleyphu/sushi-go-web#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
