@@ -11,10 +11,13 @@ var server = http.createServer(app);
 var io = socketIO(server);
 
 var players = {};
+let connectedSockets = [];
 
 app.use(express.static(clientPath));
 
 io.on('connection', (socket) => {
+
+  connectedSockets.push(socket.id);
 
   // User initialization
   console.log('user connected: ', socket.id);
@@ -23,11 +26,15 @@ io.on('connection', (socket) => {
     socket
   };
   socket.emit('newMessage', generateMessage('ADMIN', `Welcome to Sushi Go! (${socket.id})`));
+  io.emit('userChange', {sockets: connectedSockets});
   socket.broadcast.emit('newMessage', generateMessage('ADMIN', `New user (${socket.id}) has joined the room`));
 
+  // User disconnect
   socket.on('disconnect', () => {
     console.log('user disconnected: ', socket.id);
     delete players[socket.id];
+    connectedSockets.splice(connectedSockets.indexOf(socket.id), 1);
+    io.emit('userChange', {sockets: connectedSockets});
     socket.broadcast.emit('newMessage', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
   });
 });
