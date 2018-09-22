@@ -50,12 +50,9 @@ io.on('connection', (socket) => {
     }
     else {
       socket.emit('newMessage', generateMessage('YOU CHOSE', players[socket.id].deck[choice].name + ' ' + players[socket.id].deck[choice].type));
-      players[socket.id].score += players[socket.id].deck[choice].points;
-      players[socket.id].deck.splice(choice, 1);
-      currentRound[socket.id] = true;
+      updatePlayerHandsAndScore(id, choice);
       
       console.log(currentRound);
-      console.log(currentRoundDone());
       if (!currentRoundDone()) {
         socket.emit('newMessage', generateMessage('ADMIN', 'Waiting for players...'));
       }
@@ -63,16 +60,12 @@ io.on('connection', (socket) => {
 
     if (currentRoundDone()) {
       roundsLeft--;
-
       io.emit('newMessage', generateMessage('ADMIN', `ROUND ${3 - roundsLeft} OVER`));
 
-      for (var id in players) {
-        io.emit('newMessage', generateMessage(id, players[id].score));
-      }
+      showPlayerScores();
 
       if (roundsLeft == 0) {
-        io.emit('newMessage', generateMessage('ADMIN', 'GAME OVER'));
-        io.emit('gameEnded');
+        endGame();
       }
       else {
         // Switch decks
@@ -86,11 +79,7 @@ io.on('connection', (socket) => {
 
   // User disconnect
   socket.on('disconnect', () => {
-    console.log('user disconnected: ', socket.id);
-    delete players[socket.id];
-    delete currentRound[socket.id];
-    io.emit('userChange', {sockets: Object.keys(players)});
-    socket.broadcast.emit('newMessage', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
+    userDisconnected(socket);
   });
 });
 
@@ -131,6 +120,12 @@ function showPlayerHands() {
   }
 }
 
+function showPlayerScores() {
+  for (var id in players) {
+    io.emit('newMessage', generateMessage(id, players[id].score));
+  }
+}
+
 function rotateHands() {
   var hands = [];
   var k = 0;
@@ -163,6 +158,20 @@ function rotateHands() {
 
 }
 
+function updatePlayerHandsAndScore(id, choice) {
+  players[id].score += players[id].deck[choice].points;
+  players[id].deck.splice(choice, 1);
+  currentRound[id] = true;
+}
+
+function userDisconnected(socket) {
+  console.log('user disconnected: ', socket.id);
+  delete players[socket.id];
+  delete currentRound[socket.id];
+  io.emit('userChange', { sockets: Object.keys(players) });
+  socket.broadcast.emit('newMessage', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
+}
+
 function currentRoundDone() {
   for (var id in currentRound) {
     if (!currentRound[id]) {
@@ -176,4 +185,9 @@ function resetCurrentRound() {
   for (var id in currentRound) {
     currentRound[id] = false;
   }
+}
+
+function endGame() {
+  io.emit('newMessage', generateMessage('ADMIN', 'GAME OVER'));
+  io.emit('gameEnded');
 }
