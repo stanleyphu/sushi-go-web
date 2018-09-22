@@ -19,6 +19,13 @@ socket.on('newActivity', function(message) {
   $('#activity').append(li);
 });
 
+socket.on('newMessage', function(message) {
+  var li = jQuery('<li></li>');
+  li.text(`${message.from}: ${message.text}`);
+
+  $('#messages').append(li);
+});
+
 socket.on('userChange', function(sckt) {
   jQuery('#users').empty();
 
@@ -32,11 +39,6 @@ socket.on('userChange', function(sckt) {
 
 socket.on('playerCards', function(player) { 
   player.deck.forEach((card, i) => {
-    // let button = jQuery("<button type='button' class='btn btn-secondary'></button>");
-    // button.text(i);
-    // button.addClass(`choice-${i}`);
-    // jQuery(".btn-group").append(button);
-
     let button = $("<button type='button' class='list-group-item list-group-item-action'></button>");
     button.text(`${card.name} ${card.type} (${card.points})`);
     // button.addClass(`choice-${i}`);
@@ -67,4 +69,15 @@ jQuery('.list-group').on('click', function(e) {
   let choice = parseInt($(e.target).attr("id"), 10);
   socket.emit('playerSelection', { choice });
   $('.list-group').empty();
+});
+
+$('#message-form').on('submit', function(e) {
+  e.preventDefault();
+  console.log('submit');
+
+  socket.emit('createMessage', {
+    text: $('[name=message]').val()
+  }, () => {
+    $('[name=message]').val('').focus();
+  });
 });

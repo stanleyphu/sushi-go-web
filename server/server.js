@@ -43,6 +43,13 @@ io.on('connection', (socket) => {
     showPlayerHands();
   });
 
+  // Chat functionality
+  socket.on('createMessage', (message, callback) => {
+    console.log('received event');
+    io.emit('newMessage', generateMessage(socket.id, message.text));
+    callback();
+  });
+
   // Game in progress
   socket.on('playerSelection', (selection) => {
     let choice = selection.choice;

@@ -1,4 +1,16 @@
-.row {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.scrollable {
+  height: 500px;
+  overflow-y: scroll;
+}
+
+#message-input {
+  flex: 4;
+}
+
+#send-msg-btn {
+  flex: 1;
+}
+
+#username {
+  color: teal;
 }
