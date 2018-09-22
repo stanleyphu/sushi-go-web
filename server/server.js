@@ -39,6 +39,7 @@ io.on('connection', (socket) => {
     roundsLeft = 3;
     io.emit('gameStarted');
     io.emit('newActivity', generateMessage('ADMIN', 'GAME STARTED'));
+    resetPlayerScores();
     initDeckAndHands();
     showPlayerHands();
   });
@@ -193,6 +194,12 @@ function currentRoundDone() {
 function resetCurrentRound() {
   for (var id in currentRound) {
     currentRound[id] = false;
+  }
+}
+
+function resetPlayerScores() {
+  for (var id in players) {
+    players[id].score = 0;
   }
 }
 
