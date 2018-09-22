@@ -49,6 +49,7 @@ socket.on('playerCards', function(player) {
 
 socket.on('gameStarted', () => {
   jQuery('#start-button').attr('disabled', true);
+  $('#activity').empty();
 });
 
 socket.on('gameEnded', () => {
@@ -58,7 +59,6 @@ socket.on('gameEnded', () => {
 jQuery('#start-button').on('click', function(e) {
   e.preventDefault();
 
-  $('#activity').empty();
   socket.emit('startGame');
 });
 
