@@ -26,6 +26,14 @@ socket.on('userChange', function(sckt) {
   });
 });
 
+socket.on('gameStarted', () => {
+  jQuery('#start-button').attr('disabled', true);
+});
+
+socket.on('gameEnded', () => {
+  jQuery('#start-button').attr('disabled', false);
+});
+
 jQuery('#start-button').on('click', function(e) {
   e.preventDefault();
 
@@ -34,7 +42,7 @@ jQuery('#start-button').on('click', function(e) {
 
 jQuery('#message-form').on('submit', function (e) {
   e.preventDefault();
-  
+
   socket.emit('createMessage', {
     from: 'User',
     text: jQuery('[name=message]').val()

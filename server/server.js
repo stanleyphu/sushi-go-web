@@ -38,6 +38,7 @@ io.on('connection', (socket) => {
     roundsLeft = 3;
     initDeckAndHands();
     showPlayerHands();
+    io.emit('gameStarted');
   });
 
   // Game in progress
@@ -71,6 +72,7 @@ io.on('connection', (socket) => {
 
       if (roundsLeft == 0) {
         io.emit('newMessage', generateMessage('ADMIN', 'GAME OVER'));
+        io.emit('gameEnded');
       }
       else {
         // Switch decks
