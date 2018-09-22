@@ -36,9 +36,10 @@ io.on('connection', (socket) => {
   // Start game
   socket.on('startGame', () => {
     roundsLeft = 3;
+    io.emit('gameStarted');
+    io.emit('newMessage', generateMessage('ADMIN', 'GAME STARTED'));
     initDeckAndHands();
     showPlayerHands();
-    io.emit('gameStarted');
   });
 
   // Game in progress
