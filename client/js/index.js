@@ -25,3 +25,9 @@ socket.on('userChange', function(sckt) {
     jQuery('#users').append(li);
   });
 });
+
+jQuery('#start-button').on('click', function(e) {
+  e.preventDefault();
+
+  socket.emit('startGame');
+});
