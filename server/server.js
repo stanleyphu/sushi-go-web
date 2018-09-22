@@ -29,15 +29,16 @@ io.on('connection', (socket) => {
   };
   currentRound[socket.id] = false;
   console.log(Object.keys(players));
-  socket.emit('newMessage', generateMessage('ADMIN', `Welcome to Sushi Go! (${socket.id})`));
+  socket.emit('newActivity', generateMessage('ADMIN', 'Welcome to Sushi Go!'));
+  socket.emit('changeUsername', { name: socket.id });
   io.emit('userChange', {sockets: Object.keys(players)});
-  socket.broadcast.emit('newMessage', generateMessage('ADMIN', `New user (${socket.id}) has joined the room`));
+  socket.broadcast.emit('newActivity', generateMessage('ADMIN', `New user (${socket.id}) has joined the room`));
 
   // Start game
   socket.on('startGame', () => {
     roundsLeft = 3;
     io.emit('gameStarted');
-    io.emit('newMessage', generateMessage('ADMIN', 'GAME STARTED'));
+    io.emit('newActivity', generateMessage('ADMIN', 'GAME STARTED'));
     initDeckAndHands();
     showPlayerHands();
   });
@@ -46,21 +47,21 @@ io.on('connection', (socket) => {
   socket.on('playerSelection', (selection) => {
     let choice = selection.choice;
     if (choice >= players[socket.id].deck.length) {
-      socket.emit('newMessage', generateMessage('ADMIN', 'Invalid choice. Choose again'));
+      socket.emit('newActivity', generateMessage('ADMIN', 'Invalid choice. Choose again'));
     }
     else {
-      socket.emit('newMessage', generateMessage('YOU CHOSE', players[socket.id].deck[choice].name + ' ' + players[socket.id].deck[choice].type));
+      socket.emit('newActivity', generateMessage('YOU CHOSE', players[socket.id].deck[choice].name + ' ' + players[socket.id].deck[choice].type));
       updatePlayerHandsAndScore(socket.id, choice);
       
       console.log(currentRound);
       if (!currentRoundDone()) {
-        socket.emit('newMessage', generateMessage('ADMIN', 'Waiting for players...'));
+        socket.emit('newActivity', generateMessage('ADMIN', 'Waiting for players...'));
       }
     }
 
     if (currentRoundDone()) {
       roundsLeft--;
-      io.emit('newMessage', generateMessage('ADMIN', `ROUND ${3 - roundsLeft} OVER`));
+      io.emit('newActivity', generateMessage('ADMIN', `ROUND ${3 - roundsLeft} OVER`));
 
       showPlayerScores();
 
@@ -70,7 +71,7 @@ io.on('connection', (socket) => {
       else {
         // Switch decks
         rotateHands();
-        io.emit('newMessage', generateMessage('ADMIN', `ROUND ${3 - roundsLeft + 1} BEGINS`));
+        io.emit('newActivity', generateMessage('ADMIN', `ROUND ${3 - roundsLeft + 1} BEGINS`));
         showPlayerHands();
         resetCurrentRound();
       }
@@ -116,14 +117,14 @@ function initDeckAndHands() {
 
 function showPlayerHands() {
   for (var id in players) {
-    players[id].socket.emit('newMessage', generateMessage('YOUR CARDS', JSON.stringify(players[id].deck)));
+    players[id].socket.emit('newActivity', generateMessage('YOUR CARDS', JSON.stringify(players[id].deck)));
     players[id].socket.emit('playerCards', { deck: players[id].deck });
   }
 }
 
 function showPlayerScores() {
   for (var id in players) {
-    io.emit('newMessage', generateMessage(id, players[id].score));
+    io.emit('newActivity', generateMessage(id, players[id].score));
   }
 }
 
@@ -170,7 +171,7 @@ function userDisconnected(socket) {
   delete players[socket.id];
   delete currentRound[socket.id];
   io.emit('userChange', { sockets: Object.keys(players) });
-  socket.broadcast.emit('newMessage', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
+  socket.broadcast.emit('newActivity', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
 }
 
 function currentRoundDone() {
@@ -188,7 +189,18 @@ function resetCurrentRound() {
   }
 }
 
+function checkWinner() {
+  let winner = {
+    id: null,
+    score: 0
+  };
+
+  for (var id in players) {
+    if (players[id].score > winner.score) {}
+  }
+}
+
 function endGame() {
-  io.emit('newMessage', generateMessage('ADMIN', 'GAME OVER'));
+  io.emit('newActivity', generateMessage('ADMIN', 'GAME OVER'));
   io.emit('gameEnded');
 }

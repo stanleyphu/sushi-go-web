@@ -7,11 +7,21 @@
       <link rel="stylesheet" href="/css/grid.css">
   </head>
     <body>
-      <p>Welcome to Sushi Go!</p>
+      <div class="container">
+        <h1>Welcome to Sushi Go!</h1>
+      </div>
 
       <div class="container">
-        <h3>Messages</h3>
-        <ol id="messages"></ol>
+        <div class="row">
+          <div class="col-6">
+            <h3>Activity</h3>
+            <ol id="activity"></ol>
+          </div>
+          <div class="col-6">
+            <h3>Chat</h3>
+          </div>
+        </div>
+        
       </div>
 
       <div class="container">
@@ -33,6 +43,7 @@
 
       <div class="container">
         <h3>Users</h3>
+        <h5>My username: <span id="username"></span></h4>
         <ul id="users"></ul>
       </div>
 

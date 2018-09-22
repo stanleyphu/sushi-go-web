@@ -8,11 +8,15 @@ socket.on('disconnect', function () {
   console.log('Disconnected from server');
 });
 
-socket.on('newMessage', function(message) {
+socket.on('changeUsername', function(username) {
+  $('#username').text(username.name);
+});
+
+socket.on('newActivity', function(message) {
   var li = jQuery('<li></li>');
   li.text(`${message.from}: ${message.text}`);
 
-  jQuery('#messages').append(li);
+  $('#activity').append(li);
 });
 
 socket.on('userChange', function(sckt) {
@@ -52,7 +56,7 @@ socket.on('gameEnded', () => {
 jQuery('#start-button').on('click', function(e) {
   e.preventDefault();
 
-  $('#messages').empty();
+  $('#activity').empty();
   socket.emit('startGame');
 });
 
