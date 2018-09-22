@@ -74,6 +74,7 @@ io.on('connection', (socket) => {
       showPlayerScores();
 
       if (roundsLeft == 0) {
+        checkWinner();
         endGame();
       }
       else {
@@ -203,6 +204,7 @@ function resetPlayerScores() {
   }
 }
 
+// TODO: ties
 function checkWinner() {
   let winner = {
     id: null,
@@ -210,8 +212,13 @@ function checkWinner() {
   };
 
   for (var id in players) {
-    if (players[id].score > winner.score) {}
+    if (players[id].score > winner.score) {
+      winner.id = id;
+      winner.score = players[id].score
+    }
   }
+
+  io.emit('newActivity', generateMessage('ADMIN', `${winner.id} WINS WITH A SCORE OF ${winner.score}`));
 }
 
 function endGame() {
