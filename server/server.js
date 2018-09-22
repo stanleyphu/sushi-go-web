@@ -42,15 +42,14 @@ io.on('connection', (socket) => {
   });
 
   // Game in progress
-  socket.on('createMessage', (message) => {
-    socket.emit('newMessage', generateMessage('YOU CHOSE', message.text));
-    var choice = parseInt(message.text, 10);
+  socket.on('playerSelection', (selection) => {
+    let choice = selection.choice;
     if (choice >= players[socket.id].deck.length) {
       socket.emit('newMessage', generateMessage('ADMIN', 'Invalid choice. Choose again'));
     }
     else {
       socket.emit('newMessage', generateMessage('YOU CHOSE', players[socket.id].deck[choice].name + ' ' + players[socket.id].deck[choice].type));
-      updatePlayerHandsAndScore(id, choice);
+      updatePlayerHandsAndScore(socket.id, choice);
       
       console.log(currentRound);
       if (!currentRoundDone()) {
@@ -117,6 +116,7 @@ function initDeckAndHands() {
 function showPlayerHands() {
   for (var id in players) {
     players[id].socket.emit('newMessage', generateMessage('YOUR CARDS', JSON.stringify(players[id].deck)));
+    players[id].socket.emit('playerCards', { deck: players[id].deck });
   }
 }
 

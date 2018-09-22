@@ -26,6 +26,15 @@ socket.on('userChange', function(sckt) {
   });
 });
 
+socket.on('playerCards', function(player) { 
+  player.deck.forEach((card, i) => {
+    let button = jQuery("<button type='button' class='btn btn-secondary'></button>");
+    button.text(i);
+    button.addClass(`choice-${i}`);
+    jQuery(".btn-group").append(button);
+  });
+});
+
 socket.on('gameStarted', () => {
   jQuery('#start-button').attr('disabled', true);
 });
@@ -40,13 +49,10 @@ jQuery('#start-button').on('click', function(e) {
   socket.emit('startGame');
 });
 
-jQuery('#message-form').on('submit', function (e) {
+jQuery('.btn-group').on('click', function(e) {
   e.preventDefault();
 
-  socket.emit('createMessage', {
-    from: 'User',
-    text: jQuery('[name=message]').val()
-  }, function () {
-    jQuery('[name=message]').val('');
-  });
+  let choice = parseInt($(e.target).text(), 10);
+  socket.emit('playerSelection', { choice });
+  $('.btn-group').empty();
 });
