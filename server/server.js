@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
     io.emit('gameStarted');
     io.emit('newActivity', generateMessage('ADMIN', 'GAME STARTED'));
     resetPlayerScores();
+    resetCurrentRound();
     initDeckAndHands();
     showPlayerHands();
   });
