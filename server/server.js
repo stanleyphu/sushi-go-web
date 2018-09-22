@@ -81,3 +81,34 @@ function showPlayerHands() {
     players[id].socket.emit('newMessage', generateMessage('YOUR CARDS', JSON.stringify(players[id].deck)));
   }
 }
+
+function rotateHands() {
+  var hands = [];
+  var k = 0;
+  var playerIds = Object.keys(players);
+  var numPlayers = playerIds.length;
+
+  console.log('BEFORE');
+  for (var id in playerIds) {
+    console.log(id, ' deck ', players[id].deck);
+  }
+
+  playerIds.forEach((id, i) => {
+    if (i == numPlayers - 1) {
+      hands.unshift(players[id].deck);
+    }
+    else {
+      hands.push(players[id].deck);
+    }
+  });
+
+  for (var id in players) {
+    players[id].deck = hands[k++];
+  }
+
+  console.log(hands);
+  console.log('AFTER');
+  for (var id in playerIds) {
+    console.log(id, ' deck ', players[id].deck);
+  }
+}
