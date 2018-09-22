@@ -32,6 +32,7 @@ io.on('connection', (socket) => {
   // Start game
   socket.on('startGame', () => {
     initDeckAndHands();
+    showPlayerHands();
   });
 
   // User disconnect
@@ -72,5 +73,11 @@ function initDeckAndHands() {
   deck.deal(3, hands);
   for (var id in players) {
     console.log(id, ' deck: ', players[id].deck);
+  }
+}
+
+function showPlayerHands() {
+  for (var id in players) {
+    players[id].socket.emit('newMessage', generateMessage('YOUR CARDS', JSON.stringify(players[id].deck)));
   }
 }
