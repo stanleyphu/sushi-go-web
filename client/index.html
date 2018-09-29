@@ -7,18 +7,24 @@
       <link rel="stylesheet" href="/css/grid.css">
   </head>
     <body>
-      <div class="container">
+      <div class="container mt-3">
         <h1>Welcome to Sushi Go!</h1>
       </div>
 
       <div class="container">
-        <div class="row mt-3 mb-3">
-          <div class="col-6 scrollable">
+        <div class="row mt-3 mb-1">
+          <div class="col-6">
             <h3>Activity</h3>
+          </div>
+          <div class="col-6">
+            <h3>Chat</h3>
+          </div>
+        </div>
+        <div class="row mt-3 mb-3">
+          <div class="col-6 scrollable" id="activities-container">
             <ol id="activity"></ol>
           </div>
-          <div class="col-6 scrollable">
-            <h3>Chat</h3>
+          <div class="col-6 scrollable" id="messages-container">
             <ul id="messages" class="list-unstyled"></ul>
           </div>
         </div>
@@ -34,11 +40,10 @@
       </div>
 
       <div class="container">
-        <h3>Actions</h3>
         <div class="row mt-3 mb-3">
           <div class="col-6">
-              <div class="list-group">
-              </div>
+            <h3>Actions</h3>
+            <div class="list-group"></div>
           </div>
         </div>
         <div class="row mt-3 mb-3">
@@ -47,8 +52,6 @@
           </div>
         </div>
       </div>
-
-      
 
       <div class="container">
         <h3>Users</h3>

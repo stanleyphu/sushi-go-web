@@ -17,6 +17,9 @@ socket.on('newActivity', function(message) {
   li.text(`${message.from}: ${message.text}`);
 
   $('#activity').append(li);
+
+  var actDiv = document.getElementById('activities-container');
+  actDiv.scrollTop = actDiv.scrollHeight;
 });
 
 socket.on('newMessage', function(message) {
@@ -24,6 +27,9 @@ socket.on('newMessage', function(message) {
   li.text(`${message.from}: ${message.text}`);
 
   $('#messages').append(li);
+
+  var msgDiv = document.getElementById('messages-container');
+  msgDiv.scrollTop = msgDiv.scrollHeight;
 });
 
 socket.on('userChange', function(sckt) {
