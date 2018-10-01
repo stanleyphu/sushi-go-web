@@ -32,18 +32,19 @@ socket.on('newMessage', function(message) {
   msgDiv.scrollTop = msgDiv.scrollHeight;
 });
 
-socket.on('userChange', function(sckt) {
+socket.on('userChange', function(message) {
   jQuery('#users').empty();
 
-  sckt.sockets.forEach((socket) => {
+  message.usernames.forEach((username) => {
     var li = jQuery('<li></li>');
-    li.text(`${socket}`);
+    li.text(`${username}`);
 
     jQuery('#users').append(li);
   });
 });
 
 socket.on('playerCards', function(player) { 
+  $('.list-group').empty();
   player.deck.forEach((card, i) => {
     let button = $("<button type='button' class='list-group-item list-group-item-action'></button>");
     button.text(`${card.name} ${card.type} (${card.points})`);
@@ -53,12 +54,17 @@ socket.on('playerCards', function(player) {
   });
 });
 
+socket.on('waitingForPlayers', () => {
+  $('.list-group').html('<p>Waiting for players..</p>');
+});
+
 socket.on('gameStarted', () => {
   jQuery('#start-button').attr('disabled', true);
   $('#activity').empty();
 });
 
 socket.on('gameEnded', () => {
+  $('.list-group').empty();
   jQuery('#start-button').attr('disabled', false);
 });
 
@@ -86,4 +92,33 @@ $('#message-form').on('submit', function(e) {
   }, () => {
     $('[name=message]').val('').focus();
   });
+});
+
+$(window).on('load', () => {
+  console.log('LOADED');
+  $('#myModal').modal({
+    backdrop: 'static',
+    keyboard: false
+  });
+});
+
+$('#nickname-form-btn').on('click', function(event) {
+  let form = $('.needs-validation');
+  console.log("valid? " + form[0].checkValidity());
+  if (form[0].checkValidity() === false) {
+    event.preventDefault();
+    event.stopPropagation();
+    form.addClass("was-validated");
+  }
+  else {
+    // send nickname to server
+    let nickname = $("#nickname-input").val();
+    console.log(nickname);
+    socket.emit('usernameSet', {
+      username: nickname
+    }, () => {
+      $('#myModal').modal('hide');
+      $('#username').text(nickname);
+    });
+  }
 });

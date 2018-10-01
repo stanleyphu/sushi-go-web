@@ -25,14 +25,20 @@ io.on('connection', (socket) => {
   players[socket.id] = {
     socket,
     deck: [],
-    score: 0
+    score: 0,
+    username: socket.id
   };
   currentRound[socket.id] = false;
   console.log(Object.keys(players));
   socket.emit('newActivity', generateMessage('ADMIN', 'Welcome to Sushi Go!'));
-  socket.emit('changeUsername', { name: socket.id });
-  io.emit('userChange', {sockets: Object.keys(players)});
-  socket.broadcast.emit('newActivity', generateMessage('ADMIN', `New user (${socket.id}) has joined the room`));
+  
+  socket.on('usernameSet', (user, callback) => {
+    players[socket.id].username = user.username;
+    let names = Object.keys(players).map(id => players[id].username)
+    io.emit('userChange', {usernames: names});
+    socket.broadcast.emit('newActivity', generateMessage('ADMIN', `New user (${players[socket.id].username}) has joined the room`));
+    callback();
+  });
 
   // Start game
   socket.on('startGame', () => {
@@ -48,7 +54,7 @@ io.on('connection', (socket) => {
   // Chat functionality
   socket.on('createMessage', (message, callback) => {
     console.log('received event');
-    io.emit('newMessage', generateMessage(socket.id, message.text));
+    io.emit('newMessage', generateMessage(players[socket.id].username, message.text));
     callback();
   });
 
@@ -65,6 +71,7 @@ io.on('connection', (socket) => {
       console.log(currentRound);
       if (!currentRoundDone()) {
         socket.emit('newActivity', generateMessage('ADMIN', 'Waiting for players...'));
+        socket.emit('waitingForPlayers');
       }
     }
 
@@ -134,7 +141,7 @@ function showPlayerHands() {
 
 function showPlayerScores() {
   for (var id in players) {
-    io.emit('newActivity', generateMessage(id, players[id].score));
+    io.emit('newActivity', generateMessage(players[id].username, players[id].score));
   }
 }
 
@@ -146,7 +153,7 @@ function rotateHands() {
 
   console.log('BEFORE');
   for (var id in players) {
-    console.log(id, ' deck ', players[id].deck);
+    console.log(id, ' (', players[id].username, ') deck ', players[id].deck);
   }
 
   playerIds.forEach((id, i) => {
@@ -165,7 +172,7 @@ function rotateHands() {
   console.log(hands);
   console.log('AFTER');
   for (var id in players) {
-    console.log(id, ' deck ', players[id].deck);
+    console.log(id, ' (', players[id].username, ') deck ', players[id].deck);
   }
 
 }
@@ -178,10 +185,11 @@ function updatePlayerHandsAndScore(id, choice) {
 
 function userDisconnected(socket) {
   console.log('user disconnected: ', socket.id);
+  socket.broadcast.emit('newActivity', generateMessage('ADMIN', `${players[socket.id].username} has left the room`));
   delete players[socket.id];
   delete currentRound[socket.id];
-  io.emit('userChange', { sockets: Object.keys(players) });
-  socket.broadcast.emit('newActivity', generateMessage('ADMIN', `User (${socket.id}) has left the room`));
+  let names = Object.keys(players).map(id => players[id].username)
+  io.emit('userChange', {usernames: names});
 }
 
 function currentRoundDone() {
@@ -219,7 +227,7 @@ function checkWinner() {
     }
   }
 
-  io.emit('newActivity', generateMessage('ADMIN', `${winner.id} WINS WITH A SCORE OF ${winner.score}`));
+  io.emit('newActivity', generateMessage('ADMIN', `${players[winner.id].username} WINS WITH A SCORE OF ${winner.score}`));
 }
 
 function endGame() {
